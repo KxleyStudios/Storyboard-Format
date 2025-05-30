@@ -12,19 +12,35 @@
         <header class="header">
             <h1><i class="fas fa-film"></i> Storyboard Formatter</h1>
             <div class="header-controls">
-                <button id="import-btn" class="btn btn-primary">
-                    <i class="fas fa-upload"></i> Import Images
-                </button>
-                <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
-                <button id="export-pdf" class="btn btn-secondary">
-                    <i class="fas fa-file-pdf"></i> Export 2x2 PDF
-                </button>
-                <button id="export-single" class="btn btn-secondary">
-                    <i class="fas fa-download"></i> Export Single Panels
-                </button>
-                <button id="export-zip" class="btn btn-secondary">
-                    <i class="fas fa-file-archive"></i> Export ZIP
-                </button>
+                <div class="control-group">
+                    <button id="new-project" class="btn btn-secondary">
+                        <i class="fas fa-file"></i> New Project
+                    </button>
+                    <button id="save-project" class="btn btn-secondary">
+                        <i class="fas fa-save"></i> Save Project
+                    </button>
+                    <button id="load-project" class="btn btn-secondary">
+                        <i class="fas fa-folder-open"></i> Load Project
+                    </button>
+                    <input type="file" id="project-input" accept=".json" style="display: none;">
+                </div>
+                <div class="control-group">
+                    <button id="import-btn" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Import Images
+                    </button>
+                    <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+                </div>
+                <div class="control-group">
+                    <button id="export-pdf" class="btn btn-secondary">
+                        <i class="fas fa-file-pdf"></i> Export 2x2 PDF
+                    </button>
+                    <button id="export-single" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Export Single Panels
+                    </button>
+                    <button id="export-zip" class="btn btn-secondary">
+                        <i class="fas fa-file-archive"></i> Export ZIP
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -87,6 +103,11 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Auto-save indicator -->
+    <div id="auto-save-indicator" class="auto-save-indicator">
+        <i class="fas fa-save"></i> <span id="save-status">Auto-saved</span>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
