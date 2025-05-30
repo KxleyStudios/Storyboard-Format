@@ -3,15 +3,31 @@ class StoryboardFormatter {
         this.panels = [];
         this.currentPanelIndex = -1;
         this.clipboardData = null;
+        this.projectName = 'Untitled Project';
+        this.autoSaveInterval = null;
+        this.hasUnsavedChanges = false;
         this.init();
     }
 
     init() {
         this.bindEvents();
         this.setupDragDrop();
+        this.loadAutoSave();
+        this.startAutoSave();
+        this.setupBeforeUnload();
     }
 
     bindEvents() {
+        // Project management
+        document.getElementById('new-project').addEventListener('click', () => this.newProject());
+        document.getElementById('save-project').addEventListener('click', () => this.saveProject());
+        document.getElementById('load-project').addEventListener('click', () => {
+            document.getElementById('project-input').click();
+        });
+        document.getElementById('project-input').addEventListener('change', (e) => {
+            this.loadProject(e.target.files[0]);
+        });
+
         // Import button
         document.getElementById('import-btn').addEventListener('click', () => {
             document.getElementById('file-input').click();
@@ -36,7 +52,10 @@ class StoryboardFormatter {
         // Editor inputs
         const inputs = ['scene-input', 'shot-input', 'description-input', 'dialogue-input', 'direction-input', 'camera-input', 'duration-input'];
         inputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', () => this.updateCurrentPanel());
+            document.getElementById(id).addEventListener('input', () => {
+                this.updateCurrentPanel();
+                this.markUnsaved();
+            });
         });
     }
 
@@ -79,6 +98,7 @@ class StoryboardFormatter {
         }
 
         this.renderPanels();
+        this.markUnsaved();
     }
 
     fileToDataURL(file) {
@@ -106,6 +126,9 @@ class StoryboardFormatter {
         container.innerHTML = this.panels.map((panel, index) => `
             <div class="panel-card ${index === this.currentPanelIndex ? 'active' : ''}" 
                  data-index="${index}" onclick="storyboard.selectPanel(${index})">
+                <button class="panel-delete" onclick="event.stopPropagation(); storyboard.deletePanelByIndex(${index})" title="Delete Panel">
+                    <i class="fas fa-trash"></i>
+                </button>
                 <div class="panel-header">
                     <span class="panel-number">${panel.scene} - ${panel.shot}</span>
                     <span class="panel-duration">${panel.duration}s</span>
@@ -205,6 +228,170 @@ class StoryboardFormatter {
             this.closeEditor();
             this.renderPanels();
         }
+    }
+
+    deletePanelByIndex(index) {
+        if (confirm('Are you sure you want to delete this panel?')) {
+            this.panels.splice(index, 1);
+            
+            // If we're deleting the currently edited panel, close the editor
+            if (this.currentPanelIndex === index) {
+                this.closeEditor();
+            } else if (this.currentPanelIndex > index) {
+                // Adjust current panel index if needed
+                this.currentPanelIndex--;
+            }
+            
+            this.renderPanels();
+            this.markUnsaved();
+        }
+    }
+
+    // Project Management
+    newProject() {
+        if (this.hasUnsavedChanges && !confirm('You have unsaved changes. Are you sure you want to create a new project?')) {
+            return;
+        }
+
+        this.panels = [];
+        this.currentPanelIndex = -1;
+        this.projectName = 'Untitled Project';
+        this.hasUnsavedChanges = false;
+        this.closeEditor();
+        this.renderPanels();
+        this.updateTitle();
+        this.clearAutoSave();
+    }
+
+    saveProject() {
+        const projectData = {
+            name: this.projectName,
+            panels: this.panels,
+            version: '1.0',
+            created: new Date().toISOString(),
+            lastModified: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${this.projectName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+        link.click();
+
+        this.hasUnsavedChanges = false;
+        this.showSaveIndicator('Project saved!', 'saved');
+    }
+
+    async loadProject(file) {
+        if (!file) return;
+
+        if (this.hasUnsavedChanges && !confirm('You have unsaved changes. Are you sure you want to load a new project?')) {
+            return;
+        }
+
+        try {
+            const text = await file.text();
+            const projectData = JSON.parse(text);
+
+            if (!projectData.panels || !Array.isArray(projectData.panels)) {
+                throw new Error('Invalid project file format');
+            }
+
+            this.panels = projectData.panels;
+            this.projectName = projectData.name || 'Loaded Project';
+            this.currentPanelIndex = -1;
+            this.hasUnsavedChanges = false;
+            
+            this.closeEditor();
+            this.renderPanels();
+            this.updateTitle();
+            this.showSaveIndicator('Project loaded!', 'saved');
+
+        } catch (error) {
+            alert('Error loading project file: ' + error.message);
+        }
+    }
+
+    // Auto-save functionality
+    startAutoSave() {
+        this.autoSaveInterval = setInterval(() => {
+            this.autoSave();
+        }, 30000); // Auto-save every 30 seconds
+    }
+
+    autoSave() {
+        if (this.panels.length === 0) return;
+
+        const autoSaveData = {
+            panels: this.panels,
+            projectName: this.projectName,
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            const data = JSON.stringify(autoSaveData);
+            // Store in memory instead of localStorage
+            window.storyboardAutoSave = data;
+            this.showSaveIndicator('Auto-saved', 'saved');
+        } catch (error) {
+            console.warn('Auto-save failed:', error);
+        }
+    }
+
+    loadAutoSave() {
+        try {
+            const data = window.storyboardAutoSave;
+            if (data) {
+                const autoSaveData = JSON.parse(data);
+                if (autoSaveData.panels && autoSaveData.panels.length > 0) {
+                    if (confirm('Found auto-saved work. Would you like to restore it?')) {
+                        this.panels = autoSaveData.panels;
+                        this.projectName = autoSaveData.projectName || 'Recovered Project';
+                        this.renderPanels();
+                        this.updateTitle();
+                        this.showSaveIndicator('Auto-save restored', 'saved');
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn('Could not load auto-save:', error);
+        }
+    }
+
+    clearAutoSave() {
+        delete window.storyboardAutoSave;
+    }
+
+    markUnsaved() {
+        this.hasUnsavedChanges = true;
+        this.updateTitle();
+    }
+
+    updateTitle() {
+        const indicator = this.hasUnsavedChanges ? ' *' : '';
+        document.title = `${this.projectName}${indicator} - Storyboard Formatter`;
+    }
+
+    showSaveIndicator(message, type = 'saving') {
+        const indicator = document.getElementById('auto-save-indicator');
+        const status = document.getElementById('save-status');
+        
+        status.textContent = message;
+        indicator.className = `auto-save-indicator show ${type}`;
+        
+        setTimeout(() => {
+            indicator.classList.remove('show');
+        }, 2000);
+    }
+
+    setupBeforeUnload() {
+        window.addEventListener('beforeunload', (e) => {
+            if (this.hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
     }
 
     async exportPDF() {
