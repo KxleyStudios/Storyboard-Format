@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storyboard Formatter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-film"></i> Storyboard Formatter</h1>
+            <div class="header-controls">
+                <button id="import-btn" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Import Images
+                </button>
+                <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+                <button id="export-pdf" class="btn btn-secondary">
+                    <i class="fas fa-file-pdf"></i> Export 2x2 PDF
+                </button>
+                <button id="export-single" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Export Single Panels
+                </button>
+                <button id="export-zip" class="btn btn-secondary">
+                    <i class="fas fa-file-archive"></i> Export ZIP
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="panels-container" id="panels-container">
+                <div class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <h2>No panels yet</h2>
+                    <p>Import images to start creating your storyboard</p>
+                </div>
+            </div>
+        </main>
+
+        <div class="panel-editor" id="panel-editor" style="display: none;">
+            <div class="editor-header">
+                <h3>Panel Editor</h3>
+                <button id="close-editor" class="btn btn-ghost">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="editor-content">
+                <div class="editor-section">
+                    <label>Scene</label>
+                    <input type="text" id="scene-input" placeholder="Scene 1">
+                </div>
+                <div class="editor-section">
+                    <label>Shot</label>
+                    <input type="text" id="shot-input" placeholder="Panel 1">
+                </div>
+                <div class="editor-section">
+                    <label>Description</label>
+                    <textarea id="description-input" placeholder="Describe what happens in this panel..."></textarea>
+                </div>
+                <div class="editor-section">
+                    <label>Dialogue/Sound</label>
+                    <textarea id="dialogue-input" placeholder="Character dialogue or sound effects..."></textarea>
+                </div>
+                <div class="editor-section">
+                    <label>Direction</label>
+                    <textarea id="direction-input" placeholder="Camera direction, character actions..."></textarea>
+                </div>
+                <div class="editor-section">
+                    <label>Camera/Lighting</label>
+                    <textarea id="camera-input" placeholder="Camera angles, lighting notes..."></textarea>
+                </div>
+                <div class="editor-section">
+                    <label>Panel Duration (seconds)</label>
+                    <input type="number" id="duration-input" placeholder="5" step="0.1" min="0">
+                </div>
+                <div class="editor-actions">
+                    <button id="copy-panel" class="btn btn-secondary">
+                        <i class="fas fa-copy"></i> Copy Panel Data
+                    </button>
+                    <button id="paste-panel" class="btn btn-secondary">
+                        <i class="fas fa-paste"></i> Paste Panel Data
+                    </button>
+                    <button id="delete-panel" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete Panel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

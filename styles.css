@@ -1,0 +1,369 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: #000;
+    color: #fff;
+    line-height: 1.4;
+    overflow-x: hidden;
+}
+
+/* Container */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #000;
+}
+
+/* Header */
+.header {
+    background: #111;
+    border-bottom: 2px solid #333;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.header h1 i {
+    margin-right: 10px;
+    color: #ccc;
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    border: 2px solid #333;
+    background: #000;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.btn:hover {
+    background: #222;
+    border-color: #555;
+}
+
+.btn-primary {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+}
+
+.btn-primary:hover {
+    background: #ccc;
+    border-color: #ccc;
+}
+
+.btn-secondary {
+    border-color: #666;
+}
+
+.btn-secondary:hover {
+    background: #333;
+    border-color: #888;
+}
+
+.btn-danger {
+    border-color: #666;
+    color: #ff6b6b;
+}
+
+.btn-danger:hover {
+    background: #331111;
+    border-color: #ff6b6b;
+}
+
+.btn-ghost {
+    background: transparent;
+    border: none;
+    color: #ccc;
+    padding: 5px;
+    min-width: auto;
+}
+
+.btn-ghost:hover {
+    color: #fff;
+    background: #333;
+}
+
+/* Main Content */
+.main-content {
+    padding: 20px;
+    min-height: calc(100vh - 100px);
+}
+
+/* Panels Container */
+.panels-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Empty State */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.empty-state h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+/* Panel Card */
+.panel-card {
+    background: #111;
+    border: 2px solid #333;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.panel-card:hover {
+    border-color: #555;
+    background: #1a1a1a;
+}
+
+.panel-card.active {
+    border-color: #fff;
+    background: #222;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #888;
+}
+
+.panel-number {
+    font-weight: bold;
+    color: #fff;
+}
+
+.panel-duration {
+    color: #666;
+}
+
+.panel-image {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    background: #000;
+    border: 1px solid #333;
+    margin-bottom: 10px;
+}
+
+.panel-info {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.panel-info div {
+    margin-bottom: 5px;
+    display: flex;
+    gap: 8px;
+}
+
+.panel-info label {
+    color: #888;
+    min-width: 60px;
+    font-weight: bold;
+}
+
+.panel-info span {
+    color: #ccc;
+    flex: 1;
+    word-break: break-word;
+}
+
+/* Panel Editor */
+.panel-editor {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 400px;
+    background: #111;
+    border-left: 2px solid #333;
+    z-index: 1000;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.panel-editor.open {
+    transform: translateX(0);
+}
+
+.editor-header {
+    padding: 20px;
+    border-bottom: 2px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0a0a0a;
+}
+
+.editor-header h3 {
+    font-size: 18px;
+    color: #fff;
+}
+
+.editor-content {
+    padding: 20px;
+}
+
+.editor-section {
+    margin-bottom: 20px;
+}
+
+.editor-section label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: #888;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.editor-section input,
+.editor-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #333;
+    background: #000;
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.editor-section input:focus,
+.editor-section textarea:focus {
+    outline: none;
+    border-color: #555;
+    background: #0a0a0a;
+}
+
+.editor-section textarea {
+    min-height: 60px;
+}
+
+.editor-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-controls {
+        justify-content: center;
+    }
+
+    .panels-container {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-editor {
+        width: 100%;
+        right: 0;
+    }
+
+    .main-content {
+        padding-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-controls {
+        flex-direction: column;
+    }
+
+    .btn {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Drag and Drop */
+.drag-over {
+    border-color: #fff !important;
+    background: #222 !important;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
