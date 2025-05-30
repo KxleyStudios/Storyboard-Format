@@ -46,6 +46,13 @@ body {
 
 .header-controls {
     display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.control-group {
+    display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
@@ -168,6 +175,34 @@ body {
 .panel-card.active {
     border-color: #fff;
     background: #222;
+}
+
+/* Delete Button */
+.panel-delete {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 30px;
+    height: 30px;
+    background: #ff4444;
+    border: 2px solid #fff;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s;
+}
+
+.panel-card:hover .panel-delete {
+    display: flex;
+}
+
+.panel-delete:hover {
+    background: #ff6666;
+    transform: scale(1.1);
 }
 
 .panel-header {
@@ -348,6 +383,36 @@ body {
 .drag-over {
     border-color: #fff !important;
     background: #222 !important;
+}
+
+/* Auto-save indicator */
+.auto-save-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 8px 12px;
+    background: #222;
+    border: 1px solid #555;
+    color: #fff;
+    font-size: 12px;
+    border-radius: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1001;
+}
+
+.auto-save-indicator.show {
+    opacity: 1;
+}
+
+.auto-save-indicator.saved {
+    color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.auto-save-indicator.saving {
+    color: #FFC107;
+    border-color: #FFC107;
 }
 
 /* Scrollbar Styling */
