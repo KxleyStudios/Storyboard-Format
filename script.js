@@ -61,10 +61,33 @@ class StoryboardFormatter {
             }
         });
 
+        // Event delegation for panel clicks - this fixes the main issue
+        document.getElementById('panels-container').addEventListener('click', (e) => {
+            const panelCard = e.target.closest('.panel-card');
+            if (panelCard && !e.target.closest('.panel-delete')) {
+                const index = parseInt(panelCard.dataset.index);
+                this.selectPanel(index);
+            }
+        });
+
+        // Event delegation for delete buttons
+        document.getElementById('panels-container').addEventListener('click', (e) => {
+            if (e.target.closest('.panel-delete')) {
+                e.stopPropagation();
+                const panelCard = e.target.closest('.panel-card');
+                const index = parseInt(panelCard.dataset.index);
+                this.deletePanelByIndex(index);
+            }
+        });
+
         // Close editor when clicking outside of it
         document.addEventListener('click', (e) => {
             const editor = document.getElementById('panel-editor');
-            if (editor.classList.contains('open') && !editor.contains(e.target)) {
+            const panelsContainer = document.getElementById('panels-container');
+            
+            if (editor.classList.contains('open') && 
+                !editor.contains(e.target) && 
+                !panelsContainer.contains(e.target)) {
                 this.closeEditor();
             }
         });
@@ -149,8 +172,8 @@ class StoryboardFormatter {
 
         container.innerHTML = this.panels.map((panel, index) => `
             <div class="panel-card ${index === this.currentPanelIndex ? 'active' : ''}" 
-                 data-index="${index}" onclick="storyboard.selectPanel(${index})">
-                <button class="panel-delete" onclick="event.stopPropagation(); storyboard.deletePanelByIndex(${index})" title="Delete Panel">
+                 data-index="${index}">
+                <button class="panel-delete" title="Delete Panel">
                     <i class="fas fa-trash"></i>
                 </button>
                 <div class="panel-header">
@@ -174,6 +197,12 @@ class StoryboardFormatter {
     }
 
     selectPanel(index) {
+        console.log('Selecting panel:', index); // Debug log
+        if (index < 0 || index >= this.panels.length) {
+            console.error('Invalid panel index:', index);
+            return;
+        }
+        
         this.currentPanelIndex = index;
         this.renderPanels();
         this.openEditor();
@@ -181,28 +210,52 @@ class StoryboardFormatter {
     }
 
     openEditor() {
+        console.log('Opening editor'); // Debug log
         const editor = document.getElementById('panel-editor');
-        editor.classList.add('open');
+        if (editor) {
+            editor.classList.add('open');
+            console.log('Editor opened, classes:', editor.className);
+        } else {
+            console.error('Editor element not found');
+        }
     }
 
     closeEditor() {
+        console.log('Closing editor'); // Debug log
         const editor = document.getElementById('panel-editor');
-        editor.classList.remove('open');
+        if (editor) {
+            editor.classList.remove('open');
+        }
         this.currentPanelIndex = -1;
         this.renderPanels();
     }
 
     populateEditor() {
-        if (this.currentPanelIndex === -1 || !this.panels[this.currentPanelIndex]) return;
+        if (this.currentPanelIndex === -1 || !this.panels[this.currentPanelIndex]) {
+            console.warn('No panel selected or panel not found');
+            return;
+        }
         
         const panel = this.panels[this.currentPanelIndex];
-        document.getElementById('scene-input').value = panel.scene || '';
-        document.getElementById('shot-input').value = panel.shot || '';
-        document.getElementById('description-input').value = panel.description || '';
-        document.getElementById('dialogue-input').value = panel.dialogue || '';
-        document.getElementById('direction-input').value = panel.direction || '';
-        document.getElementById('camera-input').value = panel.camera || '';
-        document.getElementById('duration-input').value = panel.duration || 5;
+        console.log('Populating editor with panel:', panel); // Debug log
+        
+        // Use safe value setting
+        this.setInputValue('scene-input', panel.scene || '');
+        this.setInputValue('shot-input', panel.shot || '');
+        this.setInputValue('description-input', panel.description || '');
+        this.setInputValue('dialogue-input', panel.dialogue || '');
+        this.setInputValue('direction-input', panel.direction || '');
+        this.setInputValue('camera-input', panel.camera || '');
+        this.setInputValue('duration-input', panel.duration || 5);
+    }
+
+    setInputValue(id, value) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = value;
+        } else {
+            console.warn(`Element with id ${id} not found`);
+        }
     }
 
     updateCurrentPanel() {
