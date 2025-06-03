@@ -162,13 +162,11 @@ class StoryboardFormatter {
     openEditor() {
         const editor = document.getElementById('panel-editor');
         editor.classList.add('open');
-        editor.style.display = 'block';
     }
 
     closeEditor() {
         const editor = document.getElementById('panel-editor');
         editor.classList.remove('open');
-        editor.style.display = 'none'; // Now actually hides the editor
         this.currentPanelIndex = -1;
         this.renderPanels();
     }
