@@ -57,6 +57,14 @@ class StoryboardFormatter {
                 this.markUnsaved();
             });
         });
+
+        // Close editor when clicking outside of it
+        document.addEventListener('click', (e) => {
+            const editor = document.getElementById('panel-editor');
+            if (editor.classList.contains('open') && !editor.contains(e.target)) {
+                this.closeEditor();
+            }
+        });
     }
 
     setupDragDrop() {
@@ -160,6 +168,7 @@ class StoryboardFormatter {
     closeEditor() {
         const editor = document.getElementById('panel-editor');
         editor.classList.remove('open');
+        editor.style.display = 'none'; // Now actually hides the editor
         this.currentPanelIndex = -1;
         this.renderPanels();
     }
