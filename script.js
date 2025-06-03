@@ -484,53 +484,50 @@ class StoryboardFormatter {
     async createSinglePanelCanvas(panel, index) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         canvas.width = 1920;
         canvas.height = 1080;
-        
-        // Black background
-        ctx.fillStyle = '#000000';
+
+        // Draw black background
+        ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Load and draw image
+
+        // Load and draw image centered and scaled
         const img = new Image();
-        await new Promise((resolve) => {
+        await new Promise(resolve => {
             img.onload = resolve;
             img.src = panel.image;
         });
-        
-        // Calculate image dimensions to fit in left portion
-        const imageArea = { x: 50, y: 50, width: 1200, height: 800 };
-        const scale = Math.min(imageArea.width / img.width, imageArea.height / img.height);
-        const scaledWidth = img.width * scale;
-        const scaledHeight = img.height * scale;
-        const imageX = imageArea.x + (imageArea.width - scaledWidth) / 2;
-        const imageY = imageArea.y + (imageArea.height - scaledHeight) / 2;
-        
-        ctx.drawImage(img, imageX, imageY, scaledWidth, scaledHeight);
-        
-        // White text
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 48px Courier New';
-        
-        // Scene and Panel info
-        const timestamp = this.formatTime(index * (panel.duration || 5));
-        ctx.fillText(timestamp, 50, 950);
-        ctx.fillText(`${panel.scene} - ${panel.shot}`, 50, 1000);
-        
-        // Dialog box (bottom area)
-        if (panel.dialogue) {
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(50, 900, 1820, 130);
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(50, 900, 1820, 130);
-            
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = '36px Courier New';
-            this.wrapText(ctx, panel.dialogue, 70, 940, 1780, 40);
-        }
-        
+
+        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+        const imgW = img.width * scale;
+        const imgH = img.height * scale;
+        const imgX = (canvas.width - imgW) / 2;
+        const imgY = (canvas.height - imgH) / 2;
+        ctx.drawImage(img, imgX, imgY, imgW, imgH);
+
+        // Overlay translucent box for text
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillRect(0, 0, canvas.width, 200); // top box
+
+        // Text settings
+        ctx.fillStyle = '#FFF';
+        ctx.font = 'bold 36px Courier New';
+        ctx.textBaseline = 'top';
+        let y = 20;
+        const x = 40;
+
+        // Draw text overlay
+        ctx.fillText(`${panel.scene} - ${panel.shot}`, x, y);
+        y += 40;
+        ctx.fillText(`DIALOG: ${panel.dialogue || 'N/A'}`, x, y);
+        y += 40;
+        ctx.fillText(`DESC: ${panel.description || 'N/A'}`, x, y);
+        y += 40;
+        ctx.fillText(`DIR: ${panel.direction || 'N/A'}`, x, y);
+        y += 40;
+        ctx.fillText(`CAM: ${panel.camera || 'N/A'}`, x, y);
+
         return canvas;
     }
 
