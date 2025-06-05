@@ -325,8 +325,11 @@ class StoryboardFormatter {
         const y = Math.floor(j / 2) * (h2 + 10) + 10;
 
         const img = new Image();
-        img.src = panel.image;
-        await new Promise(resolve => img.onload = resolve);
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = panel.image;
+        });
 
         pdf.addImage(panel.image, 'JPEG', x, y, w2, h2 - 30);
         pdf.setFontSize(8);
