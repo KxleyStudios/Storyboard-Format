@@ -218,6 +218,7 @@ class StoryboardFormatter {
     closeEditor() {
         const editor = document.getElementById('panel-editor');
         editor.classList.remove('open');
+        editor.style.display = 'none'; // ADD THIS LINE
         this.currentPanelIndex = -1;
         this.renderPanels();
     }
