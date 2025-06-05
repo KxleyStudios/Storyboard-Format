@@ -208,6 +208,56 @@ body {
     min-height: 80px;
 }
 
+/* Hide file inputs for custom file upload buttons */
+input[type="file"] {
+  display: none;
+}
+
+/* Disabled button state */
+.btn:disabled,
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Panel editor overlay for mobile (optional, for better UX) */
+@media (max-width: 768px) {
+  .panel-editor {
+    box-shadow: 0 0 20px #000;
+    width: 100%;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 1000;
+  }
+}
+
+/* Hide panel editor when not open (if using .open class for slide-in/out) */
+.panel-editor:not(.open) {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Scrollbar styling for dark mode */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Drag and drop highlight */
+.drag-over {
+  border-color: #fff !important;
+  background: #222 !important;
+}
+
 @media (max-width: 1024px) {
     .main-content {
         grid-template-columns: 1fr;
