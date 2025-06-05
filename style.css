@@ -232,12 +232,6 @@ button:disabled {
   }
 }
 
-/* Hide panel editor when not open (if using .open class for slide-in/out) */
-.panel-editor:not(.open) {
-  pointer-events: none;
-  visibility: hidden;
-}
-
 /* Scrollbar styling for dark mode */
 ::-webkit-scrollbar {
   width: 8px;
