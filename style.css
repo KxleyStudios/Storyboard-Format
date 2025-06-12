@@ -160,6 +160,10 @@ body {
     border: 2px solid #333;
     padding: 20px;
     height: fit-content;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
 }
 
 .editor-header {
@@ -229,6 +233,8 @@ button:disabled {
     right: 0;
     top: 0;
     z-index: 1000;
+    max-height: 100vh;
+    border-radius: 0;
   }
 }
 
@@ -255,6 +261,12 @@ button:disabled {
 @media (max-width: 1024px) {
     .main-content {
         grid-template-columns: 1fr;
+    }
+    
+    .panel-editor {
+        position: relative;
+        top: auto;
+        max-height: none;
     }
     
     .header {
