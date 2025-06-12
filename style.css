@@ -9,6 +9,9 @@ body {
     background-color: #000;
     color: #fff;
     line-height: 1.6;
+    /* Improve rendering performance */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -30,6 +33,8 @@ body {
     font-size: 2.5rem;
     font-weight: bold;
     color: #fff;
+    /* Reduce repaints */
+    will-change: auto;
 }
 
 .header-controls {
@@ -49,11 +54,14 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    /* Optimize for animations */
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .btn:hover {
     background-color: #ddd;
-    transform: translateY(-2px);
+    transform: translateY(-2px) translateZ(0);
 }
 
 .btn-small {
@@ -68,6 +76,9 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
+    /* Optimize for animations */
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .btn-small:hover {
@@ -88,6 +99,9 @@ body {
     padding: 20px;
     background-color: #111;
     border: 2px solid #333;
+    /* Improve scrolling performance */
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .empty-state {
@@ -110,11 +124,15 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    /* Optimize for animations and reduce repaints */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform, border-color;
 }
 
 .panel-item:hover {
     border-color: #fff;
-    transform: translateY(-2px);
+    transform: translateY(-2px) translateZ(0);
 }
 
 .panel-item.active {
@@ -128,15 +146,23 @@ body {
     object-fit: cover;
     display: block;
     margin-bottom: 10px;
+    /* Optimize image rendering */
+    image-rendering: auto;
+    image-rendering: crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
 }
 
 .panel-info {
     font-size: 12px;
+    /* Prevent layout shifts during updates */
+    min-height: 60px;
 }
 
 .panel-info div {
     margin-bottom: 5px;
     word-wrap: break-word;
+    /* Optimize text rendering */
+    text-rendering: optimizeSpeed;
 }
 
 .panel-info .scene {
@@ -153,6 +179,9 @@ body {
     font-style: italic;
     max-height: 40px;
     overflow: hidden;
+    /* Optimize text overflow */
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .panel-editor {
@@ -160,6 +189,14 @@ body {
     border: 2px solid #333;
     padding: 20px;
     height: fit-content;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    /* Improve scrolling performance */
+    -webkit-overflow-scrolling: touch;
+    /* Reduce repaints during input */
+    contain: layout style paint;
 }
 
 .editor-header {
@@ -195,6 +232,11 @@ body {
     border: 2px solid #333;
     color: #fff;
     font-size: 14px;
+    /* Optimize input performance */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* Reduce layout thrashing */
+    will-change: border-color;
 }
 
 .form-group input:focus,
@@ -206,6 +248,9 @@ body {
 .form-group textarea {
     resize: vertical;
     min-height: 80px;
+    /* Optimize textarea performance */
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 /* Hide file inputs for custom file upload buttons */
@@ -218,6 +263,8 @@ input[type="file"] {
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  /* Disable hover effects for disabled buttons */
+  transform: none !important;
 }
 
 /* Panel editor overlay for mobile (optional, for better UX) */
@@ -229,10 +276,12 @@ button:disabled {
     right: 0;
     top: 0;
     z-index: 1000;
+    max-height: 100vh;
+    border-radius: 0;
   }
 }
 
-/* Scrollbar styling for dark mode */
+/* Optimized scrollbar styling for dark mode */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -241,6 +290,8 @@ button:disabled {
 }
 ::-webkit-scrollbar-thumb {
   background: #333;
+  /* Smooth scrollbar interactions */
+  transition: background 0.2s ease;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
@@ -252,9 +303,18 @@ button:disabled {
   background: #222 !important;
 }
 
+/* Performance optimizations for responsive design */
 @media (max-width: 1024px) {
     .main-content {
         grid-template-columns: 1fr;
+    }
+    
+    .panel-editor {
+        position: relative;
+        top: auto;
+        max-height: none;
+        /* Remove sticky positioning on smaller screens for better performance */
+        contain: none;
     }
     
     .header {
@@ -283,5 +343,33 @@ button:disabled {
     
     .container {
         padding: 15px;
+    }
+    
+    /* Reduce animations on mobile for better performance */
+    .panel-item {
+        transition: border-color 0.2s ease;
+    }
+    
+    .panel-item:hover {
+        transform: none;
+    }
+    
+    .btn, .btn-small {
+        transition: background-color 0.2s ease;
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

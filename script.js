@@ -3,6 +3,7 @@ class StoryboardFormatter {
     this.panels = [];
     this.currentPanelIndex = -1;
     this.copiedPanelData = null;
+    this.updateTimeout = null; // Debounce timer
     this.initializeEventListeners();
   }
 
@@ -51,15 +52,64 @@ class StoryboardFormatter {
       this.closePanelEditor();
     });
 
+    // Use debounced input handlers to prevent excessive updates
     ['sceneInput', 'panelInput', 'dialogInput', 'panelLength'].forEach(id => {
       document.getElementById(id).addEventListener('input', () => {
-        this.updateCurrentPanel();
+        this.debouncedUpdateCurrentPanel();
       });
     });
   }
 
+  // Debounced update function to prevent excessive re-rendering
+  debouncedUpdateCurrentPanel() {
+    if (this.updateTimeout) {
+      clearTimeout(this.updateTimeout);
+    }
+    
+    // Update the current panel data immediately (for responsiveness)
+    this.updateCurrentPanelData();
+    
+    // Debounce the visual update to prevent lag
+    this.updateTimeout = setTimeout(() => {
+      this.updatePanelDisplay();
+    }, 300); // Wait 300ms after user stops typing
+  }
+
+  // Update panel data without re-rendering the entire grid
+  updateCurrentPanelData() {
+    if (this.currentPanelIndex >= 0 && this.panels[this.currentPanelIndex]) {
+      const panel = this.panels[this.currentPanelIndex];
+      panel.scene = document.getElementById('sceneInput').value;
+      panel.panel = document.getElementById('panelInput').value;
+      panel.dialog = document.getElementById('dialogInput').value;
+      panel.length = document.getElementById('panelLength').value;
+    }
+  }
+
+  // Update only the specific panel's display, not the entire grid
+  updatePanelDisplay() {
+    if (this.currentPanelIndex >= 0 && this.panels[this.currentPanelIndex]) {
+      const panel = this.panels[this.currentPanelIndex];
+      const panelElement = document.querySelector(`[data-index="${this.currentPanelIndex}"]`);
+      
+      if (panelElement) {
+        const panelInfo = panelElement.querySelector('.panel-info');
+        if (panelInfo) {
+          panelInfo.innerHTML = `
+            <div class="scene">${panel.scene || 'Scene not set'}</div>
+            <div class="panel-num">${panel.panel || 'Panel not set'}</div>
+            <div class="dialog">${panel.dialog || 'No dialog'}</div>
+          `;
+        }
+      }
+    }
+  }
+
   handleImageImport(files) {
-    Array.from(files).forEach((file, index) => {
+    const fileArray = Array.from(files);
+    let processedCount = 0;
+    
+    fileArray.forEach((file, index) => {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -73,7 +123,12 @@ class StoryboardFormatter {
             length: ''
           };
           this.panels.push(panel);
-          this.renderPanels();
+          
+          processedCount++;
+          // Only re-render when all files are processed
+          if (processedCount === fileArray.filter(f => f.type.startsWith('image/')).length) {
+            this.renderPanels();
+          }
         };
         reader.readAsDataURL(file);
       }
@@ -87,22 +142,49 @@ class StoryboardFormatter {
       return;
     }
 
-    grid.innerHTML = this.panels.map((panel, index) => `
-      <div class="panel-item ${index === this.currentPanelIndex ? 'active' : ''}" 
-           data-index="${index}" onclick="storyboard.selectPanel(${index})">
+    // Use DocumentFragment for better performance
+    const fragment = document.createDocumentFragment();
+    
+    this.panels.forEach((panel, index) => {
+      const panelDiv = document.createElement('div');
+      panelDiv.className = `panel-item ${index === this.currentPanelIndex ? 'active' : ''}`;
+      panelDiv.dataset.index = index;
+      panelDiv.onclick = () => this.selectPanel(index);
+      
+      panelDiv.innerHTML = `
         <img src="${panel.image}" alt="${panel.imageName}" class="panel-image">
         <div class="panel-info">
           <div class="scene">${panel.scene || 'Scene not set'}</div>
           <div class="panel-num">${panel.panel || 'Panel not set'}</div>
           <div class="dialog">${panel.dialog || 'No dialog'}</div>
         </div>
-      </div>
-    `).join('');
+      `;
+      
+      fragment.appendChild(panelDiv);
+    });
+    
+    // Clear and append all at once
+    grid.innerHTML = '';
+    grid.appendChild(fragment);
   }
 
   selectPanel(index) {
+    // Update the previous active panel's class without full re-render
+    if (this.currentPanelIndex >= 0) {
+      const prevPanel = document.querySelector(`[data-index="${this.currentPanelIndex}"]`);
+      if (prevPanel) {
+        prevPanel.classList.remove('active');
+      }
+    }
+    
     this.currentPanelIndex = index;
-    this.renderPanels();
+    
+    // Update the new active panel's class
+    const currentPanel = document.querySelector(`[data-index="${index}"]`);
+    if (currentPanel) {
+      currentPanel.classList.add('active');
+    }
+    
     this.showPanelEditor();
     this.loadPanelData();
   }
@@ -113,8 +195,16 @@ class StoryboardFormatter {
 
   closePanelEditor() {
     document.getElementById('panelEditor').style.display = 'none';
+    
+    // Remove active class from current panel
+    if (this.currentPanelIndex >= 0) {
+      const currentPanel = document.querySelector(`[data-index="${this.currentPanelIndex}"]`);
+      if (currentPanel) {
+        currentPanel.classList.remove('active');
+      }
+    }
+    
     this.currentPanelIndex = -1;
-    this.renderPanels();
   }
 
   loadPanelData() {
@@ -127,15 +217,10 @@ class StoryboardFormatter {
     }
   }
 
+  // Keep the old updateCurrentPanel method for compatibility with copy/paste
   updateCurrentPanel() {
-    if (this.currentPanelIndex >= 0 && this.panels[this.currentPanelIndex]) {
-      const panel = this.panels[this.currentPanelIndex];
-      panel.scene = document.getElementById('sceneInput').value;
-      panel.panel = document.getElementById('panelInput').value;
-      panel.dialog = document.getElementById('dialogInput').value;
-      panel.length = document.getElementById('panelLength').value;
-      this.renderPanels();
-    }
+    this.updateCurrentPanelData();
+    this.updatePanelDisplay();
   }
 
   copyPanelData() {
@@ -159,7 +244,7 @@ class StoryboardFormatter {
       panel.dialog = this.copiedPanelData.dialog;
       panel.length = this.copiedPanelData.length;
       this.loadPanelData();
-      this.renderPanels();
+      this.updatePanelDisplay();
       alert('Panel data pasted!');
     }
   }
